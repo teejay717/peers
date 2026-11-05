@@ -59,7 +59,8 @@ INSERT INTO EQUIPMENT (EquipmentID, EquipmentTypeName, TotalQuantity, AvailableQ
 (704, 'Volleyball',          12, 12, 'Sports'),
 (705, 'Dumbbell Set',        10, 10, 'Fitness'),
 (706, 'Yoga Mat',            15, 15, 'Fitness'),
-(707, 'Jump Rope',           20, 20, 'Both');   -- belongs to both subtypes
+(707, 'Jump Rope',           20, 20, 'Both'),     -- belongs to both subtypes, never reserved
+(708, 'Stopwatch',           10,  0, 'Sports');   -- out of stock (AvailableQuantity = 0 for Q1)
 
 -- ---------- SPORTS_EQUIPMENT (subtype) ----------
 INSERT INTO SPORTS_EQUIPMENT (EquipmentID, SportsType) VALUES
@@ -67,7 +68,8 @@ INSERT INTO SPORTS_EQUIPMENT (EquipmentID, SportsType) VALUES
 (702, 'Table Tennis'),
 (703, 'Badminton'),
 (704, 'Volleyball'),
-(707, 'Boxing');
+(707, 'Boxing'),
+(708, 'Track');
 
 -- ---------- FITNESS_EQUIPMENT (subtype) ----------
 INSERT INTO FITNESS_EQUIPMENT (EquipmentID, TrainingType) VALUES
@@ -76,21 +78,23 @@ INSERT INTO FITNESS_EQUIPMENT (EquipmentID, TrainingType) VALUES
 (707, 'Cardio');
 
 -- ---------- RESERVATION ----------
--- 401: the professor's booking from the normalization example
+-- 401: professor booking from normalization example
 -- 402: pending student request (no staff assigned yet)
 -- 403: completed (equipment returned)
 -- 404: denied
--- 405: cancelled by the student
+-- 405: cancelled by student
+-- 406: approved professor booking
+-- 407: second approved reservation for Reserver 1 (for Q6 HAVING > 1)
 INSERT INTO RESERVATION (ReservationID, ReserverID, StaffID, ReservationDate, StartTime, EndTime, ReservationStatus) VALUES
 (401, 1, 10001, '2026-08-01', '15:30:00', '17:30:00', 'Approved'),
 (402, 2, NULL,  '2026-11-05', '09:00:00', '10:00:00', 'Pending'),
 (403, 3, 10001, '2026-10-20', '13:00:00', '14:00:00', 'Completed'),
 (404, 4, 10002, '2026-10-22', '10:00:00', '11:00:00', 'Denied'),
 (405, 5, 10001, '2026-10-25', '14:00:00', '15:00:00', 'Cancelled'),
-(406, 6, 10001, '2026-11-06', '08:00:00', '10:00:00', 'Approved');
+(406, 6, 10001, '2026-11-06', '08:00:00', '10:00:00', 'Approved'),
+(407, 1, 10001, '2026-11-12', '13:00:00', '15:00:00', 'Approved');
 
 -- ---------- RESERVATION_EQUIPMENT (line items) ----------
--- Students reserve exactly one item (qty 1); professors may reserve several.
 INSERT INTO RESERVATION_EQUIPMENT (ReservationID, EquipmentID, QuantityReserved) VALUES
 (401, 701, 1),
 (401, 702, 2),
@@ -100,9 +104,5 @@ INSERT INTO RESERVATION_EQUIPMENT (ReservationID, EquipmentID, QuantityReserved)
 (404, 702, 1),
 (405, 703, 1),
 (406, 705, 4),
-(406, 706, 10);
-
--- ---------- Quick checks (optional) ----------
--- SELECT * FROM EQUIPMENT;
--- SELECT r.ReservationID, rv.FirstName, rv.LastName, r.ReservationDate, r.ReservationStatus
---   FROM RESERVATION r JOIN RESERVER rv ON r.ReserverID = rv.ReserverID;
+(406, 706, 10),
+(407, 701, 2);
