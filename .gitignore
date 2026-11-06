@@ -1,3 +1,7 @@
 target/
-.vscode/
 *.class
+
+# VS Code - share launch and settings configs, ignore personal workspace cache
+.vscode/*
+!.vscode/launch.json
+!.vscode/settings.json
