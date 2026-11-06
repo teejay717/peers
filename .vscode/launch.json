@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "edu.addu.peers.Main",
+      "projectName": "peers",
+      "env": {
+        "DB_USER": "root",
+        "DB_PASSWORD": "root"
+      }
+    },
+    {
+      "type": "java",
+      "name": "DBConnection",
+      "request": "launch",
+      "mainClass": "edu.addu.peers.DBConnection",
+      "projectName": "peers",
+      "env": {
+        "DB_USER": "root",
+        "DB_PASSWORD": "root"
+      }
+    }
+  ]
+}
