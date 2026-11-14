@@ -5,3 +5,8 @@ target/
 .vscode/*
 !.vscode/launch.json
 !.vscode/settings.json
+
+# PDF Generation artifacts
+generate_doc.js
+final_documentation.html
+4-310G5W5.pdf
