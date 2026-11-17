@@ -14,7 +14,7 @@ public class DBConnection {
             System.err.println("\n[Database Connection Error]");
             System.err.println("Could not connect to MySQL at: " + URL);
             System.err.println("Connecting as user: '" + USER + "'");
-            System.err.println("Tip: Check that MySQL is running, the 'peers' database exists (run database/schema.sql), and DB_USER/DB_PASSWORD in .vscode/launch.json match your local MySQL credentials.\n");
+            System.err.println("Tip: Check that MySQL is running, the 'peers' database exists (run database.sql), and DB_USER/DB_PASSWORD in .vscode/launch.json match your local MySQL credentials.\n");
             throw e;
         }
     }

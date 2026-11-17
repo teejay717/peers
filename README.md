@@ -33,7 +33,8 @@ peers/
 │   │   ├── EquipmentDAO.java    # CRUD operations for Equipment table
 │   │   ├── InputHelper.java     # Robust user input validation and boundary checking
 │   │   ├── Main.java            # Interactive console menu driver
-│   │   └── QueryDAO.java        # Week 4 analytical reports & advanced SQL queries (Q1-Q8)
+│   │   ├── QueryDAO.java        # Week 4 analytical reports & advanced SQL queries (Q1-Q8)
+│   │   └── ReservationDAO.java  # Reservation management and return transactions (ACID)
 │   └── test/java/edu/addu/peers/
 │       └── AppTest.java         # Base unit test suite
 ├── database.sql                 # Root copy of the unified database script
@@ -137,6 +138,7 @@ When launched, the application displays the main menu:
 ==========================================
 1. Equipment Management (CRUD)
 2. Reports & Queries (Week 4)
+3. Reservation Management (Reserve & Return)
 0. Exit Application
 ```
 
@@ -144,7 +146,7 @@ When launched, the application displays the main menu:
 - **1. View All Equipment**: Displays all inventory with current and total quantities formatted in a clean table.
 - **2. Search Equipment by ID**: Retrieves a specific equipment record by its primary key.
 - **3. Add New Equipment (INSERT)**: Prompts for equipment name, category (`Sports`, `Fitness`, `Both`), and total quantity.
-- **4. Update Equipment (UPDATE)**: Updates equipment metadata and recalculates available inventory.
+- **4. Update Equipment (UPDATE)**: Updates equipment metadata and recalculates available inventory. Features non-destructive defaults (press Enter to keep existing name/type).
 - **5. Delete Equipment (DELETE)**: Deletes an equipment record. If the equipment is actively tied to reservations, an informative foreign key constraint message is displayed without crashing.
 - **0. Back to Main Menu**
 
@@ -158,6 +160,12 @@ When launched, the application displays the main menu:
 - **7. Top 5 Most Reserved Equipment** (`ORDER BY` + `LIMIT 5`)
 - **8. Average Stock per Category** (`AVG` + `GROUP BY`)
 - **9. Run All 8 Queries**: Executes the entire query suite sequentially for quick demonstration and screenshot capture.
+- **0. Back to Main Menu**
+
+### Submenu 3: Reservation Management (Reserve & Return)
+- **1. View All Reservations**: Displays all reservations with borrower names, equipment items, quantities, time slots, and lifecycle statuses.
+- **2. Create New Reservation (Borrow Equipment)**: Pre-displays live equipment inventory with current availability, validates stock, creates header and line items, and atomically decrements inventory via ACID transaction.
+- **3. Return Equipment (Mark as Completed)**: Displays active/approved bookings, marks status as `Completed`, and automatically restores returned stock back to inventory.
 - **0. Back to Main Menu**
 
 ---
