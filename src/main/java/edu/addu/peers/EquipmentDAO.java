@@ -61,6 +61,29 @@ public class EquipmentDAO {
         }
     }
 
+    public static Equipment getById(int id) {
+        String sql = "SELECT * FROM EQUIPMENT WHERE EquipmentID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Equipment(
+                            rs.getInt("EquipmentID"),
+                            rs.getString("EquipmentTypeName"),
+                            rs.getString("EquipmentType"),
+                            rs.getInt("TotalQuantity"),
+                            rs.getInt("AvailableQuantity")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return null;
+    }
+
     public static void add(Equipment equipment) {
         String sql = "INSERT INTO EQUIPMENT "
                 + "(EquipmentTypeName, TotalQuantity, AvailableQuantity, EquipmentType) "

@@ -14,9 +14,10 @@ public class Main {
             System.out.println("==========================================");
             System.out.println("1. Equipment Management (CRUD)");
             System.out.println("2. Reports & Queries (Week 4)");
+            System.out.println("3. Reservation Management (Reserve & Return)");
             System.out.println("0. Exit Application");
 
-            int choice = InputHelper.readInt(sc, "Enter your choice (0-2): ", 0, 2);
+            int choice = InputHelper.readInt(sc, "Enter your choice (0-3): ", 0, 3);
 
             switch (choice) {
                 case 1:
@@ -24,6 +25,9 @@ public class Main {
                     break;
                 case 2:
                     handleReportsMenu(sc);
+                    break;
+                case 3:
+                    handleReservationMenu(sc);
                     break;
                 case 0:
                     System.out.println("\nThank you for using P.E.E.R.S. Goodbye!");
@@ -62,15 +66,32 @@ public class Main {
                     break;
                 case 3:
                     String name = InputHelper.readString(sc, "Enter Equipment Name: ");
-                    String type = InputHelper.readString(sc, "Enter Equipment Type (Sports/Fitness/Both): ");
+                    String type = InputHelper.readEquipmentType(sc, "Enter Equipment Type (Sports/Fitness/Both): ", null);
                     int quantity = InputHelper.readInt(sc, "Enter Total Quantity: ");
                     EquipmentDAO.add(new Equipment(name, type, quantity));
                     break;
                 case 4:
                     int updateId = InputHelper.readInt(sc, "Enter Equipment ID to Update: ");
-                    String newName = InputHelper.readString(sc, "Enter New Equipment Name: ");
-                    String newType = InputHelper.readString(sc, "Enter New Equipment Type (Sports/Fitness/Both): ");
-                    int newQuantity = InputHelper.readInt(sc, "Enter New Total Quantity: ");
+                    Equipment existing = EquipmentDAO.getById(updateId);
+                    if (existing == null) {
+                        System.out.println("No equipment found with ID: " + updateId);
+                        break;
+                    }
+                    System.out.printf("Found: %s | %s | Available: %d / Total: %d%n",
+                            existing.getEquipmentTypeName(),
+                            existing.getEquipmentType(),
+                            existing.getAvailableQuantity(),
+                            existing.getTotalQuantity());
+
+                    String newName = InputHelper.readOptionalString(sc,
+                            "Enter New Equipment Name [Press Enter to keep '" + existing.getEquipmentTypeName() + "']: ",
+                            existing.getEquipmentTypeName());
+                    String newType = InputHelper.readEquipmentType(sc,
+                            "Enter New Equipment Type (Sports/Fitness/Both) [Press Enter to keep '" + existing.getEquipmentType() + "']: ",
+                            existing.getEquipmentType());
+                    int newQuantity = InputHelper.readOptionalInt(sc,
+                            "Enter New Total Quantity [Press Enter to keep " + existing.getTotalQuantity() + "]: ",
+                            existing.getTotalQuantity());
                     EquipmentDAO.update(new Equipment(updateId, newName, newType, newQuantity));
                     break;
                 case 5:
@@ -158,5 +179,77 @@ public class Main {
         QueryDAO.query7_Top5ReservedEquipment();
         QueryDAO.query8_AverageStockPerCategory();
         System.out.println("\n[All queries executed successfully.]");
+    }
+
+    /**
+     * Sub-menu 3: Reservation Management (Reserve & Return)
+     */
+    private static void handleReservationMenu(Scanner sc) {
+        while (true) {
+            System.out.println("\n------------------------------------------");
+            System.out.println("    RESERVATION MANAGEMENT (P.E.E.R.S.)   ");
+            System.out.println("------------------------------------------");
+            System.out.println("1. View All Reservations");
+            System.out.println("2. Create New Reservation (Borrow Equipment)");
+            System.out.println("3. Return Equipment (Mark as Completed)");
+            System.out.println("0. Back to Main Menu");
+
+            int choice = InputHelper.readInt(sc, "Enter your choice (0-3): ", 0, 3);
+
+            switch (choice) {
+                case 1:
+                    ReservationDAO.viewAll();
+                    break;
+                case 2:
+                    System.out.println("\n--- Current Equipment Inventory ---");
+                    EquipmentDAO.viewAll();
+
+                    int reserverId = InputHelper.readInt(sc, "\nEnter Reserver ID (e.g. 2 for Student, 1 for Prof): ");
+                    String[] reserverInfo = ReservationDAO.getReserverInfo(reserverId);
+                    if (reserverInfo == null) {
+                        System.out.println("Error: Reserver ID " + reserverId + " does not exist.");
+                        break;
+                    }
+                    String reserverName = reserverInfo[0];
+                    String reserverType = reserverInfo[1];
+                    System.out.printf("Reserver: %s (%s)%n", reserverName, reserverType);
+
+                    String today = java.time.LocalDate.now().toString();
+                    String date = InputHelper.readOptionalString(sc, "Enter Reservation Date (YYYY-MM-DD) [Press Enter for today " + today + "]: ", today);
+                    String start = InputHelper.readOptionalString(sc, "Enter Start Time (HH:MM:SS) [Press Enter for '09:00:00']: ", "09:00:00");
+                    String end = InputHelper.readOptionalString(sc, "Enter End Time (HH:MM:SS) [Press Enter for '10:00:00']: ", "10:00:00");
+
+                    java.util.List<ReservationDAO.ItemRequest> items = new java.util.ArrayList<>();
+                    while (true) {
+                        int equipmentId = InputHelper.readInt(sc, "Enter Equipment ID to Reserve: ");
+                        int quantity = InputHelper.readInt(sc, "Enter Quantity to Reserve: ");
+                        items.add(new ReservationDAO.ItemRequest(equipmentId, quantity));
+
+                        if ("Professor".equalsIgnoreCase(reserverType)) {
+                            System.out.print("Add another equipment item to this class reservation? (y/n): ");
+                            String more = sc.nextLine().trim();
+                            if (!more.equalsIgnoreCase("y") && !more.equalsIgnoreCase("yes")) {
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+
+                    ReservationDAO.createReservation(reserverId, items, date, start, end);
+                    break;
+                case 3:
+                    System.out.println("\n--- Active Borrowed Reservations ---");
+                    ReservationDAO.viewActive();
+
+                    int resId = InputHelper.readInt(sc, "\nEnter Reservation ID to Return: ");
+                    ReservationDAO.returnEquipment(resId);
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
     }
 }
